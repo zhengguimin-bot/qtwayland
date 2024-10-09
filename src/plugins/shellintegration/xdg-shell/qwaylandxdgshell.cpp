@@ -437,8 +437,46 @@ void QWaylandXdgSurface::propagateSizeHints()
 
 void QWaylandXdgSurface::setContentGeometry(const QRect &rect)
 {
-    if (window()->isExposed())
-        set_window_geometry(rect.x(), rect.y(), rect.width(), rect.height());
+    //set_window_geometry(rect.x(), rect.y(), 0, 0);
+    if (!m_window)
+            return ;
+
+    if (m_window->window()->title().contains("CMRemoteWidget"))
+    {
+         qCWarning(lcQpaWayland) << "[wayland] qtWayland setWindowGeometry window:" << m_window->window()->title() << " x:" << rect.x() << " y:" << rect.y() << " w: " << rect.width() << " h: "<< rect.height();
+         setFullScreen(rect);
+    }
+    else
+    {
+        if (m_window) {
+            QPoint position = m_window->geometry().topLeft();
+            qCWarning(lcQpaWayland) << "[wayland] qtWayland setWindowGeometry window:" << m_window->window()->title() << " x:" << position.x() << " y:" << position.y() << " w: " << rect.width() << " h: "<< rect.height();
+            // HACK: Set window position through .set_window_geometry(x, y, 0, 0)
+            set_window_geometry(position.x() > 0 ? position.x() : 0, position.y() > 0 ? position.y() : 0, 0, 0);
+         }
+    }
+}
+
+void QWaylandXdgSurface::setFullScreen(const QRect &rect)
+{
+    if (m_toplevel && m_window) {
+        QWaylandDisplay *display = m_window->display();
+        if (display) {
+                QList<QWaylandScreen*> screens = display->screens();
+                for (auto screen : screens) {
+                        qCWarning(lcQpaWayland) << "==== [wayland] qtWayland  setFullScreen  window:" << m_window->window()->title() << " screen x:" << screen->geometry().x() << " y:" << screen->geometry().y() << " w: " << screen->geometry().width() << " h: "<< screen->geometry().height();
+                        if ( rect == screen->geometry()) {
+                                ::xdg_toplevel_set_fullscreen(m_toplevel->object(), screen->output());
+                                break;
+                        }
+                }
+#if 0
+                qCWarning(lcQpaWayland) << "[wayland] qtWayland  set_max_size  window:" << m_window->window()->title() << " w:" << rect.width() << " h: " << rect.height();
+                ::xdg_toplevel_set_max_size(m_toplevel->object(), rect.width(), rect.height());
+                ::xdg_toplevel_set_maximized(m_toplevel->object());
+#endif
+        }
+    }
 }
 
 void QWaylandXdgSurface::setSizeHints()

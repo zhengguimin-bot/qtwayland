@@ -468,7 +468,7 @@ void QWaylandWindow::setGeometry(const QRect &r)
     if (isExposed() && !mInResizeFromApplyConfigure && exposeGeometry != mLastExposeGeometry)
         sendExposeEvent(exposeGeometry);
 
-    if (mShellSurface)
+    if (mShellSurface && !window()->title().contains(QString::fromUtf8("CMRemoteWidget")))
         mShellSurface->setContentGeometry(windowContentGeometry());
 
     if (isOpaque() && mMask.isEmpty())

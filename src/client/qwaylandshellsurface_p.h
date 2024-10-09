@@ -68,6 +68,7 @@ public:
     virtual void propagateSizeHints() {}
 
     virtual void setWindowGeometry(const QRect &rect);
+    virtual void setFullScreen(const QRect &rect) { Q_UNUSED(rect); }
     virtual void setWindowPosition(const QPoint &position) { Q_UNUSED(position); }
     virtual void setWindowSize(const QSize &size) { Q_UNUSED(size); }
 

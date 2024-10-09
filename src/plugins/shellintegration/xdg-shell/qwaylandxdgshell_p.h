@@ -72,6 +72,7 @@ public:
     QString externWindowHandle() override;
     void setWindowPosition(const QPoint &position) override;
 
+    void setFullScreen(const QRect &rect) override;
     void setSizeHints();
 
     void *nativeResource(const QByteArray &resource);
